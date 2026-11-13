@@ -1,0 +1,6 @@
+{
+  "name": "AttendLedger",
+  "description": "University Student Attendance Management System with Express.js REST API, File System audit logging, Yargs CLI, MongoDB schema modeling, and Docker/CI-CD deployment blueprint.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
