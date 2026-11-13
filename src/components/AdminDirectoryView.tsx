@@ -115,7 +115,7 @@ export function AdminDirectoryView({ courses, refreshKey, onDataChanged }: Props
         });
         setFeedback({
           type: 'success',
-          message: `Added student ${stuRoll} (${stuName}) via POST /api/students and recorded audit log.`,
+          message: `Added student ${stuRoll} (${stuName}) to the enrollment directory.`,
         });
       }
       setShowStudentForm(false);
@@ -190,7 +190,7 @@ export function AdminDirectoryView({ courses, refreshKey, onDataChanged }: Props
         });
         setFeedback({
           type: 'success',
-          message: `Added faculty ${facCode} (${facName}) via POST /api/faculty.`,
+          message: `Added faculty ${facCode} (${facName}) to the department directory.`,
         });
       }
       setShowFacultyForm(false);

@@ -107,7 +107,7 @@ export function FacultyAttendanceView({ courses, facultyList, onSaved }: Props) 
       });
       setFeedback({
         type: 'success',
-        message: `Saved ${res.savedCount} attendance records for ${selectedCourse} (${selectedDate}) and appended audit entry to logs/attendance.log.`,
+        message: `Saved ${res.savedCount} attendance records for ${selectedCourse} (${selectedDate}).`,
       });
       onSaved();
     } catch (err) {
@@ -128,7 +128,7 @@ export function FacultyAttendanceView({ courses, facultyList, onSaved }: Props) 
             Mark Class Attendance
           </h1>
           <p className="mt-1 text-sm text-slate-600">
-            Select a course and lecture date to record daily student attendance. Submissions persist to disk and append to the File System audit log.
+            Select a course and lecture date to record daily student attendance.
           </p>
         </div>
 

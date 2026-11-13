@@ -1,20 +1,16 @@
 import {
-  BookOpen,
   ClipboardCheck,
   FileText,
   GraduationCap,
   Menu,
-  Terminal,
   Users,
   X,
 } from 'lucide-react';
 import { useEffect, useState, type ComponentType } from 'react';
 import { api, type OverviewResponse } from './api/client';
 import { AdminDirectoryView } from './components/AdminDirectoryView';
-import { AssignmentReportView } from './components/AssignmentReportView';
 import { AttendanceRecordsView } from './components/AttendanceRecordsView';
 import { FacultyAttendanceView } from './components/FacultyAttendanceView';
-import { LogsAndCliView } from './components/LogsAndCliView';
 import { StudentPortalView } from './components/StudentPortalView';
 import type { Course, Faculty } from './types/attendance';
 
@@ -22,9 +18,7 @@ type NavSection =
   | 'mark-attendance'
   | 'records'
   | 'student-portal'
-  | 'admin'
-  | 'logs-cli'
-  | 'assignment';
+  | 'admin';
 
 interface NavItem {
   id: NavSection;
@@ -38,8 +32,6 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'records', label: 'Attendance Records', group: 'Faculty', icon: FileText },
   { id: 'student-portal', label: 'My Attendance %', group: 'Student', icon: GraduationCap },
   { id: 'admin', label: 'Students & Faculty', group: 'Administration', icon: Users },
-  { id: 'logs-cli', label: 'FS Logs & Yargs CLI', group: 'System & DevOps', icon: Terminal },
-  { id: 'assignment', label: 'Assignment Q1–Q5', group: 'System & DevOps', icon: BookOpen },
 ];
 
 export default function App() {
@@ -78,7 +70,7 @@ export default function App() {
   }
 
   const currentNav = NAV_ITEMS.find((n) => n.id === activeSection)!;
-  const groups = ['Faculty', 'Student', 'Administration', 'System & DevOps'];
+  const groups = ['Faculty', 'Student', 'Administration'];
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex">
@@ -133,7 +125,7 @@ export default function App() {
 
         <div className="border-t border-slate-200 px-5 py-4 text-xs text-slate-500">
           <div className="font-medium text-slate-700">B.Voc Software Development</div>
-          <div className="mt-0.5">Semester 5 · Full Stack Web Dev - 2</div>
+          <div className="mt-0.5">Semester 5 · Academic Portal</div>
         </div>
       </aside>
 
@@ -216,21 +208,21 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            {activeSection !== 'assignment' ? (
-              <button
-                type="button"
-                onClick={() => setActiveSection('assignment')}
-                className="h-9 rounded-md bg-blue-800 px-4 text-xs font-semibold text-white hover:bg-blue-900 transition-colors whitespace-nowrap shrink-0"
-              >
-                View Assignment Q1–Q5
-              </button>
-            ) : (
+            {activeSection !== 'mark-attendance' ? (
               <button
                 type="button"
                 onClick={() => setActiveSection('mark-attendance')}
                 className="h-9 rounded-md bg-blue-800 px-4 text-xs font-semibold text-white hover:bg-blue-900 transition-colors whitespace-nowrap shrink-0"
               >
-                Open Attendance Portal
+                Mark Attendance
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setActiveSection('records')}
+                className="h-9 rounded-md bg-blue-800 px-4 text-xs font-semibold text-white hover:bg-blue-900 transition-colors whitespace-nowrap shrink-0"
+              >
+                View Records
               </button>
             )}
           </div>
@@ -313,12 +305,6 @@ export default function App() {
                 onDataChanged={triggerRefresh}
               />
             )}
-
-            {activeSection === 'logs-cli' && (
-              <LogsAndCliView refreshKey={refreshKey} onDataChanged={triggerRefresh} />
-            )}
-
-            {activeSection === 'assignment' && <AssignmentReportView />}
           </div>
         </main>
       </div>

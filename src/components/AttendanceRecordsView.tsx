@@ -81,7 +81,7 @@ export function AttendanceRecordsView({ courses, refreshKey }: Props) {
             Attendance Records Ledger
           </h1>
           <p className="mt-1 text-sm text-slate-600">
-            Query historical attendance records stored via <code className="font-mono text-xs text-slate-800">GET /api/attendance</code> across courses, dates, and statuses.
+            Filter, review, and export historical attendance records across courses, dates, and statuses.
           </p>
         </div>
 
