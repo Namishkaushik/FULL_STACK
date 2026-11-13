@@ -41,6 +41,10 @@ export default function App() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [facultyList, setFacultyList] = useState<Faculty[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [recordPreset, setRecordPreset] = useState<{ course: string; date: string }>({
+    course: 'ALL',
+    date: '',
+  });
 
   useEffect(() => {
     let active = true;
@@ -101,7 +105,12 @@ export default function App() {
                     <li key={item.id}>
                       <button
                         type="button"
-                        onClick={() => setActiveSection(item.id)}
+                        onClick={() => {
+                          if (item.id === 'records') {
+                            setRecordPreset({ course: 'ALL', date: '' });
+                          }
+                          setActiveSection(item.id);
+                        }}
                         className={`flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                           active
                             ? 'bg-blue-50 text-blue-900'
@@ -162,6 +171,9 @@ export default function App() {
                           <button
                             type="button"
                             onClick={() => {
+                              if (item.id === 'records') {
+                                setRecordPreset({ course: 'ALL', date: '' });
+                              }
                               setActiveSection(item.id);
                               setMobileMenuOpen(false);
                             }}
@@ -219,7 +231,10 @@ export default function App() {
             ) : (
               <button
                 type="button"
-                onClick={() => setActiveSection('records')}
+                onClick={() => {
+                  setRecordPreset({ course: 'ALL', date: '' });
+                  setActiveSection('records');
+                }}
                 className="h-9 rounded-md bg-blue-800 px-4 text-xs font-semibold text-white hover:bg-blue-900 transition-colors whitespace-nowrap shrink-0"
               >
                 View Records
@@ -287,11 +302,20 @@ export default function App() {
                 courses={courses}
                 facultyList={facultyList}
                 onSaved={triggerRefresh}
+                onViewRecords={(courseCode, date) => {
+                  setRecordPreset({ course: courseCode, date });
+                  setActiveSection('records');
+                }}
               />
             )}
 
             {activeSection === 'records' && (
-              <AttendanceRecordsView courses={courses} refreshKey={refreshKey} />
+              <AttendanceRecordsView
+                courses={courses}
+                refreshKey={refreshKey}
+                initialCourse={recordPreset.course}
+                initialDate={recordPreset.date}
+              />
             )}
 
             {activeSection === 'student-portal' && (

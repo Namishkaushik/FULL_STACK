@@ -21,6 +21,12 @@ const isProduction = process.env.NODE_ENV === 'production';
 async function startServer() {
   const app = express();
   app.use(express.json({ limit: '1mb' }));
+  app.use('/api', (_req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
+  });
 
   // ---------------------------------------------------------------------------
   // Health & Overview
@@ -214,6 +220,8 @@ async function startServer() {
       records = [...records].sort((a, b) => {
         const dateCmp = b.date.localeCompare(a.date);
         if (dateCmp !== 0) return dateCmp;
+        const markedCmp = b.markedAt.localeCompare(a.markedAt);
+        if (markedCmp !== 0) return markedCmp;
         return a.rollNumber.localeCompare(b.rollNumber);
       });
 

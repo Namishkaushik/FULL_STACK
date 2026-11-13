@@ -10,6 +10,7 @@ import type {
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {
+    cache: 'no-store',
     headers: {
       'Content-Type': 'application/json',
       ...(options?.headers || {}),

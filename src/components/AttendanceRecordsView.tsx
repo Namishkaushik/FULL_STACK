@@ -6,16 +6,36 @@ import type { AttendanceRecord, Course } from '../types/attendance';
 interface Props {
   courses: Course[];
   refreshKey: number;
+  initialCourse?: string;
+  initialDate?: string;
 }
 
-export function AttendanceRecordsView({ courses, refreshKey }: Props) {
+function getLocalTodayIso(): string {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+export function AttendanceRecordsView({
+  courses,
+  refreshKey,
+  initialCourse = 'ALL',
+  initialDate = '',
+}: Props) {
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
-  const [courseFilter, setCourseFilter] = useState<string>('ALL');
+  const [courseFilter, setCourseFilter] = useState<string>(initialCourse);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
-  const [dateFilter, setDateFilter] = useState<string>('');
+  const [dateFilter, setDateFilter] = useState<string>(initialDate);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCourseFilter(initialCourse);
+    setDateFilter(initialDate);
+  }, [initialCourse, initialDate]);
 
   useEffect(() => {
     let active = true;
@@ -143,6 +163,18 @@ export function AttendanceRecordsView({ courses, refreshKey }: Props) {
           className="h-9 rounded-md border border-slate-300 bg-white px-3 font-mono text-sm text-slate-800 focus:border-blue-700 focus:outline-none"
         />
 
+        <button
+          type="button"
+          onClick={() => setDateFilter(getLocalTodayIso())}
+          className={`h-9 rounded-md border px-3 text-xs font-medium transition-colors whitespace-nowrap shrink-0 ${
+            dateFilter === getLocalTodayIso()
+              ? 'border-blue-800 bg-blue-50 text-blue-900'
+              : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+          }`}
+        >
+          Today
+        </button>
+
         {(courseFilter !== 'ALL' || statusFilter !== 'ALL' || dateFilter || searchQuery) && (
           <button
             type="button"
@@ -183,6 +215,7 @@ export function AttendanceRecordsView({ courses, refreshKey }: Props) {
                 <th className="px-4 py-3 font-medium">Student</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Marked By</th>
+                <th className="px-4 py-3 font-medium">Remarks</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
@@ -195,16 +228,17 @@ export function AttendanceRecordsView({ courses, refreshKey }: Props) {
                     <td className="px-4 py-2.5"><div className="h-4 w-32 rounded bg-slate-200" /></td>
                     <td className="px-4 py-2.5"><div className="h-4 w-16 rounded bg-slate-200" /></td>
                     <td className="px-4 py-2.5"><div className="h-4 w-28 rounded bg-slate-200" /></td>
+                    <td className="px-4 py-2.5"><div className="h-4 w-24 rounded bg-slate-200" /></td>
                   </tr>
                 ))
               ) : filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-slate-500">
+                  <td colSpan={7} className="px-4 py-10 text-center text-sm text-slate-500">
                     No attendance records match the current filters.
                   </td>
                 </tr>
               ) : (
-                filteredRecords.slice(0, 100).map((record) => {
+                filteredRecords.map((record) => {
                   const statusTone =
                     record.status === 'Present'
                       ? 'text-emerald-700'
@@ -229,8 +263,11 @@ export function AttendanceRecordsView({ courses, refreshKey }: Props) {
                       <td className={`px-4 py-2.5 text-xs font-semibold whitespace-nowrap ${statusTone}`}>
                         {record.status}
                       </td>
-                      <td className="px-4 py-2.5 text-xs text-slate-600">
+                      <td className="px-4 py-2.5 text-xs text-slate-600 whitespace-nowrap">
                         {record.markedBy}
+                      </td>
+                      <td className="px-4 py-2.5 text-xs text-slate-500">
+                        {record.remarks || '—'}
                       </td>
                     </tr>
                   );

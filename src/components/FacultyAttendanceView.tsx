@@ -12,19 +12,31 @@ interface Props {
   courses: Course[];
   facultyList: Faculty[];
   onSaved: () => void;
+  onViewRecords?: (courseCode: string, date: string) => void;
 }
 
-export function FacultyAttendanceView({ courses, facultyList, onSaved }: Props) {
+function getLocalTodayIso(): string {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+export function FacultyAttendanceView({ courses, facultyList, onSaved, onViewRecords }: Props) {
   const [selectedCourse, setSelectedCourse] = useState<string>(courses[0]?.courseCode || 'BV501');
-  const [selectedDate, setSelectedDate] = useState<string>('2026-11-13');
+  const [selectedDate, setSelectedDate] = useState<string>(() => getLocalTodayIso());
   const [students, setStudents] = useState<Student[]>([]);
   const [statuses, setStatuses] = useState<Record<string, AttendanceStatus>>({});
   const [remarks, setRemarks] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
-    null
-  );
+  const [feedback, setFeedback] = useState<{
+    type: 'success' | 'error';
+    message: string;
+    savedCourse?: string;
+    savedDate?: string;
+  } | null>(null);
 
   useEffect(() => {
     if (courses.length > 0 && !courses.some((c) => c.courseCode === selectedCourse)) {
@@ -107,7 +119,9 @@ export function FacultyAttendanceView({ courses, facultyList, onSaved }: Props) 
       });
       setFeedback({
         type: 'success',
-        message: `Saved ${res.savedCount} attendance records for ${selectedCourse} (${selectedDate}).`,
+        message: `Saved ${res.savedCount} attendance records for ${selectedCourse} on ${selectedDate}.`,
+        savedCourse: selectedCourse,
+        savedDate: selectedDate,
       });
       onSaved();
     } catch (err) {
@@ -210,13 +224,22 @@ export function FacultyAttendanceView({ courses, facultyList, onSaved }: Props) 
       {feedback && (
         <div
           role="status"
-          className={`rounded-lg border px-4 py-3 text-sm ${
+          className={`flex flex-wrap items-center justify-between gap-3 rounded-lg border px-4 py-3 text-sm ${
             feedback.type === 'success'
               ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
               : 'border-red-200 bg-red-50 text-red-900'
           }`}
         >
-          {feedback.message}
+          <span>{feedback.message}</span>
+          {feedback.type === 'success' && onViewRecords && feedback.savedCourse && feedback.savedDate && (
+            <button
+              type="button"
+              onClick={() => onViewRecords(feedback.savedCourse!, feedback.savedDate!)}
+              className="text-xs font-semibold text-emerald-900 underline underline-offset-2 hover:text-emerald-700 whitespace-nowrap shrink-0"
+            >
+              View in Attendance Records
+            </button>
+          )}
         </div>
       )}
 
